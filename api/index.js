@@ -12,15 +12,25 @@ const app = express();
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 
-// ── DEBUG: show all env vars keys (not values) so we can see what's set ──────
-app.get("/api/debug", async (req, res) => {
+// ── DEBUG ─────────────────────────────────────────────────────────────────────
+app.get('/api/debug', async (req, res) => {
+  let dbTest = null;
+  try {
+    const db = require('../db');
+    await db.getAllReports();
+    dbTest = 'OK';
+  } catch (err) {
+    dbTest = err.message;
+  }
   res.json({
     envKeys: Object.keys(process.env).filter(k =>
-      ['DATABASE_URL','STAFF_PIN','ADMIN_PIN','STAFF_TOKEN','ADMIN_TOKEN','POSTGRES_URL','SUPABASE_URL','SUPABASE_DB_URL'].includes(k)
+      ['DATABASE_URL','STAFF_PIN','ADMIN_PIN','STAFF_TOKEN','ADMIN_TOKEN','POSTGRES_URL','SUPABASE_URL','POSTGRES_URL_NON_POOLING'].includes(k)
     ),
     hasDatabaseUrl: !!process.env.DATABASE_URL,
     hasPostgresUrl: !!process.env.POSTGRES_URL,
-    nodeEnv: process.env.NODE_ENV
+    hasNonPooling: !!process.env.POSTGRES_URL_NON_POOLING,
+    nodeEnv: process.env.NODE_ENV,
+    dbTest
   });
 });
 
@@ -57,7 +67,7 @@ app.post('/api/reports', async (req, res) => {
       success: false,
       message: 'Failed to save report.',
       error: err.message,
-      hint: !process.env.DATABASE_URL ? 'DATABASE_URL is not set in environment variables!' : 'DB connection failed — check your DATABASE_URL value.'
+      hint: !process.env.DATABASE_URL ? 'DATABASE_URL is not set!' : 'DB connection failed — check DATABASE_URL value.'
     });
   }
 });
@@ -76,7 +86,6 @@ app.get('/api/reports', async (req, res) => {
     }));
     res.json(summaries);
   } catch (err) {
-    console.error('getAllReports error:', err);
     res.status(500).json({ success: false, message: 'Failed to retrieve reports.', error: err.message });
   }
 });
@@ -85,10 +94,9 @@ app.get('/api/reports/details/:date', async (req, res) => {
   try {
     const report = await getDb().getReport(req.params.date);
     if (!report)
-      return res.status(404).json({ success: false, message: 'Report not found for this date.' });
+      return res.status(404).json({ success: false, message: 'Report not found.' });
     res.json(report);
   } catch (err) {
-    console.error('getReport error:', err);
     res.status(500).json({ success: false, message: 'Failed to retrieve report details.', error: err.message });
   }
 });
@@ -122,7 +130,6 @@ app.get('/api/carry-forward', async (req, res) => {
       staffLedger
     });
   } catch (err) {
-    console.error('carry-forward error:', err);
     res.status(500).json({ success: false, message: 'Failed to load carry-forward data.', error: err.message });
   }
 });
@@ -159,7 +166,6 @@ app.get('/api/dashboard-summary', async (req, res) => {
       salesSplit, expenseBreakdown, trendData
     });
   } catch (err) {
-    console.error('dashboard-summary error:', err);
     res.status(500).json({ success: false, message: 'Failed to compile dashboard summary.', error: err.message });
   }
 });
