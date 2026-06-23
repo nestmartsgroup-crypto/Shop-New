@@ -161,10 +161,11 @@ function handleLogin(e) {
   e.preventDefault();
   const pin = loginPin.value.trim();
   
+  // Send only the password to the server; server will determine role securely
   fetch('/api/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ role: pin === '6282' ? 'admin' : 'staff', password: pin })
+    body: JSON.stringify({ password: pin })
   })
   .then(res => {
     if (!res.ok) throw new Error('Unauthorized');

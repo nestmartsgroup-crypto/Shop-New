@@ -24,12 +24,23 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Authentication Endpoint
 app.post('/api/login', (req, res) => {
-  const { role, password } = req.body;
-  
-  if (role === 'staff' && password === STAFF_PIN) {
-    return res.json({ success: true, role: 'staff', token: STAFF_TOKEN });
-  } else if (role === 'admin' && password === ADMIN_PIN) {
+  const { role, password } = req.body || {};
+
+  // Backwards-compatible: if client provided a role, validate as before
+  if (role) {
+    if (role === 'staff' && password === STAFF_PIN) {
+      return res.json({ success: true, role: 'staff', token: STAFF_TOKEN });
+    } else if (role === 'admin' && password === ADMIN_PIN) {
+      return res.json({ success: true, role: 'admin', token: ADMIN_TOKEN });
+    }
+    return res.status(401).json({ success: false, message: 'Invalid password. Please try again.' });
+  }
+
+  // Preferred: determine role on the server from the provided password
+  if (password === ADMIN_PIN) {
     return res.json({ success: true, role: 'admin', token: ADMIN_TOKEN });
+  } else if (password === STAFF_PIN) {
+    return res.json({ success: true, role: 'staff', token: STAFF_TOKEN });
   }
 
   return res.status(401).json({ success: false, message: 'Invalid password. Please try again.' });

@@ -48,10 +48,14 @@ if ($action === 'login' || strpos($api_path, '/api/login') !== false) {
     $input = getJsonInput();
     $password = isset($input['password']) ? $input['password'] : '';
     
-    if ($password === '1234') {
-        echo json_encode(["success" => true, "role" => "staff", "token" => "staff-session-token"]);
-    } else if ($password === '6282') {
-        echo json_encode(["success" => true, "role" => "admin", "token" => "admin-session-token"]);
+        // Allow overriding via environment variables in hosted environments
+        $staff_pin = getenv('STAFF_PIN') ?: '1234';
+        $admin_pin = getenv('ADMIN_PIN') ?: '6282';
+
+        if ($password === $staff_pin) {
+            echo json_encode(["success" => true, "role" => "staff", "token" => getenv('STAFF_TOKEN') ?: "staff-session-token"]);
+        } else if ($password === $admin_pin) {
+            echo json_encode(["success" => true, "role" => "admin", "token" => getenv('ADMIN_TOKEN') ?: "admin-session-token"]);
     } else {
         http_response_code(401);
         echo json_encode(["success" => false, "message" => "Invalid PIN."]);
