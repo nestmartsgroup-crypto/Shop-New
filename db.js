@@ -5,20 +5,18 @@ let pool = null;
 function getPool() {
   if (pool) return pool;
 
-  // Supabase Vercel integration sets POSTGRES_URL (with pgbouncer) and DATABASE_URL
-  // For direct queries (DDL like CREATE TABLE), we need the direct connection
   const connectionString = process.env.POSTGRES_URL_NON_POOLING 
     || process.env.DATABASE_URL 
     || process.env.POSTGRES_URL;
 
   if (!connectionString) {
-    throw new Error('No database connection string found. Set DATABASE_URL in Vercel environment variables.');
+    throw new Error('No database connection string found.');
   }
 
   pool = new Pool({
     connectionString,
-    ssl: { rejectUnauthorized: false },
-    max: 1,                // Serverless: keep pool small
+    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+    max: 1,
     idleTimeoutMillis: 10000,
     connectionTimeoutMillis: 10000,
   });
