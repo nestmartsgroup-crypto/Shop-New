@@ -13,9 +13,12 @@ function getPool() {
     throw new Error('No database connection string found.');
   }
 
+  // Add sslmode=require to connection string if not already there,
+  // and use NODE_TLS_REJECT_UNAUTHORIZED to bypass cert validation
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
   pool = new Pool({
     connectionString,
-    ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
     max: 1,
     idleTimeoutMillis: 10000,
     connectionTimeoutMillis: 10000,
