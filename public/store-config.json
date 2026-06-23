@@ -1,0 +1,36 @@
+{
+  "otherIncomes": [
+    "Oil Sale",
+    "Scrap Sale"
+  ],
+  "generalExpenses": [
+    "Fuel Expense",
+    "Repairs & Maintenance",
+    "Overtime Allowance",
+    "Rent-Staff",
+    "Gas",
+    "Staff Food Expense",
+    "Wastage Removal Expense"
+  ],
+  "vendorPurchases": [
+    "OIL,CURD,FLOUR POWDER",
+    "SUGAR",
+    "CHICKEN MASALA",
+    "SOUCE"
+  ],
+  "wageStaff": [
+    "SAFAF",
+    "VISHNU",
+    "NABIR",
+    "AZIZUL"
+  ],
+  "staffLedger": [
+    { "name": "NABIR", "designation": "CLEANER" },
+    { "name": "SAFAF", "designation": "SM" },
+    { "name": "BYFIN", "designation": "BILLER" },
+    { "name": "ASHIQ", "designation": "PACKER" },
+    { "name": "VISHNU", "designation": "JUICER" },
+    { "name": "JURAISE", "designation": "CUTTER" },
+    { "name": "AZIZUL", "designation": "CAPTAIN" }
+  ]
+}

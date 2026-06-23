@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Store Daily reporting & Analytics</title>
+  <!-- Google Fonts: Inter & Oswald -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ================= LOGIN SCREEN ================= -->
+  <div id="login-screen" class="login-container">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="logo-badge">
+          <i data-lucide="store" class="icon-logo"></i>
+        </div>
+        <h1>STORE PORTAL</h1>
+        <p>Enter your access PIN to continue</p>
+      </div>
+      <form id="login-form">
+        <div class="input-group">
+          <label for="login-pin">Access Code</label>
+          <div class="input-wrapper">
+            <i data-lucide="key-round" class="input-icon"></i>
+            <input type="password" id="login-pin" placeholder="••••" maxlength="6" autocomplete="current-password" required>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">
+          <span>Login to Portal</span>
+          <i data-lucide="arrow-right"></i>
+        </button>
+        <div id="login-error" class="error-msg hide">Incorrect passcode. Please try again.</div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= APP CONTAINER ================= -->
+  <div id="app-container" class="app-layout hide">
+    
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-logo">
+          <i data-lucide="trending-up"></i>
+        </div>
+        <span class="brand-text">DAILY STORE</span>
+      </div>
+      
+      <nav class="sidebar-nav">
+        <ul>
+          <li class="nav-item active" id="nav-wizard" data-view="view-staff-wizard">
+            <a href="#">
+              <i data-lucide="file-edit"></i>
+              <span class="nav-text">Daily Entry</span>
+            </a>
+          </li>
+          <li class="nav-item admin-only hide" id="nav-dashboard" data-view="view-admin-dashboard">
+            <a href="#">
+              <i data-lucide="bar-chart-3"></i>
+              <span class="nav-text">Monitoring</span>
+            </a>
+          </li>
+          <li class="nav-item admin-only hide" id="nav-reports" data-view="view-admin-reports">
+            <a href="#">
+              <i data-lucide="folder-kanban"></i>
+              <span class="nav-text">Reports Log</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+      
+      <div class="sidebar-footer">
+        <div class="user-profile">
+          <div class="avatar" id="user-avatar-initials">S</div>
+          <div class="profile-info">
+            <span class="username" id="user-role-text">Staff Member</span>
+            <span class="user-sub">Active Session</span>
+          </div>
+        </div>
+        <button id="btn-logout" class="btn-icon-only" title="Logout">
+          <i data-lucide="log-out"></i>
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN MAIN CONTENT -->
+    <main class="main-content">
+      
+      <!-- TOP HEADER BAR -->
+      <header class="top-header">
+        <div class="header-title">
+          <h2 id="header-page-title">Daily Entry</h2>
+          <p id="header-page-subtitle">Fill in the daily reports details</p>
+        </div>
+        
+        <div class="header-actions">
+          <div class="date-badge">
+            <i data-lucide="calendar"></i>
+            <span id="current-date-display"></span>
+          </div>
+        </div>
+      </header>
+
+      <!-- CONTENT PANELS -->
+      <div class="content-body">
+
+        <!-- ================= STAFF WIZARD VIEW ================= -->
+        <section id="view-staff-wizard" class="view-panel active">
+          <div class="wizard-container">
+            <div class="wizard-stepper">
+              <div class="step-indicator active" data-step="1">
+                <span class="step-num">1</span>
+                <span class="step-title">General</span>
+              </div>
+              <div class="step-indicator" data-step="2">
+                <span class="step-num">2</span>
+                <span class="step-title">Sales & Income</span>
+              </div>
+              <div class="step-indicator" data-step="3">
+                <span class="step-num">3</span>
+                <span class="step-title">Expenses</span>
+              </div>
+              <div class="step-indicator" data-step="4">
+                <span class="step-num">4</span>
+                <span class="step-title">Wages</span>
+              </div>
+              <div class="step-indicator" data-step="5">
+                <span class="step-num">5</span>
+                <span class="step-title">Stock & Closing</span>
+              </div>
+            </div>
+
+            <form id="report-wizard-form" class="wizard-form-body">
+              
+              <!-- STEP 1: GENERAL & OPENING -->
+              <div class="wizard-step-content active" data-step="1">
+                <div class="step-header">
+                  <h3>Opening Balances & General Details</h3>
+                  <p>Provide report date and opening register balances</p>
+                </div>
+                
+                <div class="grid-2-col">
+                  <div class="form-group">
+                    <label for="report-date">Report Date</label>
+                    <input type="date" id="report-date" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="open-cash">Opening Cash (₹)</label>
+                    <input type="number" id="open-cash" placeholder="0" min="0" step="0.01" required>
+                  </div>
+                </div>
+
+                <div class="grid-2-col margin-top">
+                  <div class="form-group">
+                    <label for="open-franchisee">Opening from Franchisee Owner (₹)</label>
+                    <input type="number" id="open-franchisee" placeholder="0" min="0" step="0.01">
+                  </div>
+                  <div class="form-group">
+                    <label for="open-mgmt">Opening from Management (₹)</label>
+                    <input type="number" id="open-mgmt" placeholder="0" min="0" step="0.01">
+                  </div>
+                </div>
+              </div>
+
+              <!-- STEP 2: INCOMES & SALES -->
+              <div class="wizard-step-content" data-step="2">
+                <div class="step-header">
+                  <h3>Daily Sales & Income</h3>
+                  <p>Fill out cash, card, online UPI sales, and delivery orders</p>
+                </div>
+
+                <div class="form-section-title">Sales Revenues</div>
+                <div class="grid-3-col">
+                  <div class="form-group">
+                    <label for="sale-cash">Cash Sale (₹)</label>
+                    <input type="number" id="sale-cash" class="calc-sale-trigger" placeholder="0" min="0" step="0.01">
+                  </div>
+                  <div class="form-group">
+                    <label for="sale-card">Card Sale (₹)</label>
+                    <input type="number" id="sale-card" class="calc-sale-trigger" placeholder="0" min="0" step="0.01">
+                  </div>
+                  <div class="form-group">
+                    <label for="sale-upi">UPI Sale (₹)</label>
+                    <input type="number" id="sale-upi" class="calc-sale-trigger" placeholder="0" min="0" step="0.01">
+                  </div>
+                  <div class="form-group">
+                    <label for="sale-zomato">Zomato Sale (₹)</label>
+                    <input type="number" id="sale-zomato" class="calc-sale-trigger" placeholder="0" min="0" step="0.01">
+                  </div>
+                  <div class="form-group">
+                    <label for="sale-swiggy">Swiggy Sale (₹)</label>
+                    <input type="number" id="sale-swiggy" class="calc-sale-trigger" placeholder="0" min="0" step="0.01">
+                  </div>
+                  <div class="form-group">
+                    <label for="sale-credit">Credit Sale (₹)</label>
+                    <input type="number" id="sale-credit" class="calc-sale-trigger" placeholder="0" min="0" step="0.01">
+                  </div>
+                </div>
+
+                <div class="summary-pill margin-top">
+                  <span>Total Sales:</span>
+                  <strong id="label-sales-total">₹0.00</strong>
+                </div>
+
+                <div class="form-section-title margin-top-lg">Other Income & Cash Influxes</div>
+                
+                <div class="dynamic-table-container">
+                  <table id="table-other-income">
+                    <thead>
+                      <tr>
+                        <th>Income Source</th>
+                        <th>Cash (₹)</th>
+                        <th>Bank (₹)</th>
+                        <th>Remarks</th>
+                        <th width="50"></th>
+                      </tr>
+                    </thead>
+                    <tbody></tbody>
+                  </table>
+                  <button type="button" id="btn-add-other-income" class="btn btn-secondary btn-sm margin-top">
+                    <i data-lucide="plus"></i> Add Custom Income Row
+                  </button>
+                </div>
+
+                <div class="grid-2-col margin-top-lg">
+                  <div class="form-group">
+                    <label for="income-franchisee">Received from Franchisee Owner (₹)</label>
+                    <input type="number" id="income-franchisee" class="calc-income-trigger" placeholder="0" min="0" step="0.01">
+                  </div>
+                  <div class="form-group">
+                    <label for="income-mgmt">Received from Management (₹)</label>
+                    <input type="number" id="income-mgmt" class="calc-income-trigger" placeholder="0" min="0" step="0.01">
+                  </div>
+                </div>
+
+                <div class="summary-pill margin-top">
+                  <span>Total Incomes:</span>
+                  <strong id="label-income-total">₹0.00</strong>
+                </div>
+              </div>
+
+              <!-- STEP 3: EXPENSES & PURCHASES -->
+              <div class="wizard-step-content" data-step="3">
+                <div class="step-header">
+                  <h3>Expenses & Material Purchases</h3>
+                  <p>Record stock purchases, daily expenses, and vendor payments</p>
+                </div>
+
+                <div class="form-section-title">Direct Stock Purchases (Meat & Veg)</div>
+                <table class="grid-table">
+                  <thead>
+                    <tr>
+                      <th>Category</th>
+                      <th>Cash (₹)</th>
+                      <th>Bank (₹)</th>
+                      <th>Remarks</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>Chicken</strong></td>
+                      <td><input type="number" id="purchase-chicken-cash" class="calc-expense-trigger" placeholder="0" min="0" step="0.01"></td>
+                      <td><input type="number" id="purchase-chicken-bank" class="calc-expense-trigger" placeholder="0" min="0" step="0.01"></td>
+                      <td><input type="text" id="purchase-chicken-remarks" placeholder="Remarks"></td>
+                    </tr>
+                    <tr>
+                      <td><strong>Vegetables</strong></td>
+                      <td><input type="number" id="purchase-veg-cash" class="calc-expense-trigger" placeholder="0" min="0" step="0.01"></td>
+                      <td><input type="number" id="purchase-veg-bank" class="calc-expense-trigger" placeholder="0" min="0" step="0.01"></td>
+                      <td><input type="text" id="purchase-veg-remarks" placeholder="Remarks"></td>
+                    </tr>
+                    <tr>
+                      <td><strong>Beef</strong></td>
+                      <td><input type="number" id="purchase-beef-cash" class="calc-expense-trigger" placeholder="0" min="0" step="0.01"></td>
+                      <td><input type="number" id="purchase-beef-bank" class="calc-expense-trigger" placeholder="0" min="0" step="0.01"></td>
+                      <td><input type="text" id="purchase-beef-remarks" placeholder="Remarks"></td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <div class="form-section-title margin-top-lg">Daily General Expenses</div>
+                <div class="dynamic-table-container">
+                  <table id="table-general-expenses">
+                    <thead>
+                      <tr>
+                        <th>Expense Head</th>
+                        <th>Cash (₹)</th>
+                        <th>Bank (₹)</th>
+                        <th>Remarks</th>
+                        <th width="50"></th>
+                      </tr>
+                    </thead>
+                    <tbody></tbody>
+                  </table>
+                  <button type="button" id="btn-add-general-expense" class="btn btn-secondary btn-sm margin-top">
+                    <i data-lucide="plus"></i> Add Custom Expense Row
+                  </button>
+                </div>
+
+                <div class="form-section-title margin-top-lg">Vendor Payments & Grocery Purchases</div>
+                <div class="dynamic-table-container">
+                  <table id="table-vendor-purchases">
+                    <thead>
+                      <tr>
+                        <th>Vendor / Item Name</th>
+                        <th>Type</th>
+                        <th>Cash (₹)</th>
+                        <th>Bank (₹)</th>
+                        <th>Remarks</th>
+                        <th width="50"></th>
+                      </tr>
+                    </thead>
+                    <tbody></tbody>
+                  </table>
+                  <button type="button" id="btn-add-vendor-purchase" class="btn btn-secondary btn-sm margin-top">
+                    <i data-lucide="plus"></i> Add Custom Vendor/Purchase Row
+                  </button>
+                </div>
+
+                <div class="summary-pill margin-top-lg">
+                  <span>Expenses Total (Cash + Bank):</span>
+                  <strong id="label-expenses-total">₹0.00</strong>
+                </div>
+              </div>
+
+              <!-- STEP 4: WAGES & LEDGER -->
+              <div class="wizard-step-content" data-step="4">
+                <div class="step-header">
+                  <h3>Wages & Staff Ledger</h3>
+                  <p>Record daily wage payouts and update staff accounts balances</p>
+                </div>
+
+                <div class="form-section-title">Wages Paid Today</div>
+                <div class="dynamic-table-container">
+                  <table id="table-wages-paid">
+                    <thead>
+                      <tr>
+                        <th>Staff Name</th>
+                        <th>Cash (₹)</th>
+                        <th>Bank (₹)</th>
+                        <th>Remarks</th>
+                        <th width="50"></th>
+                      </tr>
+                    </thead>
+                    <tbody></tbody>
+                  </table>
+                  <button type="button" id="btn-add-wage-row" class="btn btn-secondary btn-sm margin-top">
+                    <i data-lucide="plus"></i> Add Custom Wage Payment
+                  </button>
+                </div>
+
+                <div class="form-section-title margin-top-lg">Staff Ledger Account Balances</div>
+                <div class="dynamic-table-container">
+                  <table id="table-staff-ledger">
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>Designation</th>
+                        <th>OB (₹)</th>
+                        <th>Wage Payable (₹)</th>
+                        <th>Wage Paid (₹)</th>
+                        <th>New Balance (₹)</th>
+                      </tr>
+                    </thead>
+                    <tbody></tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- STEP 5: MEAT STOCK, DENOMINATIONS & CLOSING -->
+              <div class="wizard-step-content" data-step="5">
+                <div class="step-header">
+                  <h3>Meat Stock, Denominations & Closing</h3>
+                  <p>Input ending registers, stock checks, and count currency notes</p>
+                </div>
+
+                <div class="grid-2-col">
+                  <!-- Meat stock -->
+                  <div>
+                    <div class="form-section-title">Meat Stock tracking (Kg)</div>
+                    <table class="grid-table">
+                      <thead>
+                        <tr>
+                          <th>Meat</th>
+                          <th>Opening</th>
+                          <th>Purchase</th>
+                          <th>Used</th>
+                          <th>Wastage</th>
+                          <th>Balance</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td><strong>Chicken</strong></td>
+                          <td><input type="number" id="meat-chick-open" class="calc-meat-trigger" placeholder="0" min="0" step="0.01"></td>
+                          <td><input type="number" id="meat-chick-purch" class="calc-meat-trigger" placeholder="0" min="0" step="0.01"></td>
+                          <td><input type="number" id="meat-chick-used" class="calc-meat-trigger" placeholder="0" min="0" step="0.01"></td>
+                          <td><input type="number" id="meat-chick-wast" class="calc-meat-trigger" placeholder="0" min="0" step="0.01"></td>
+                          <td><strong id="label-meat-chick-bal">0.00</strong></td>
+                        </tr>
+                        <tr>
+                          <td><strong>Beef</strong></td>
+                          <td><input type="number" id="meat-beef-open" class="calc-meat-trigger" placeholder="0" min="0" step="0.01"></td>
+                          <td><input type="number" id="meat-beef-purch" class="calc-meat-trigger" placeholder="0" min="0" step="0.01"></td>
+                          <td><input type="number" id="meat-beef-used" class="calc-meat-trigger" placeholder="0" min="0" step="0.01"></td>
+                          <td><input type="number" id="meat-beef-wast" class="calc-meat-trigger" placeholder="0" min="0" step="0.01"></td>
+                          <td><strong id="label-meat-beef-bal">0.00</strong></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <!-- Bills Receivable / Payable -->
+                  <div>
+                    <div class="form-section-title">Other Bills Receivable / Payable</div>
+                    <div class="dynamic-table-container">
+                      <table id="table-bills">
+                        <thead>
+                          <tr>
+                            <th>Bill Type</th>
+                            <th>Name / Description</th>
+                            <th>Amount (₹)</th>
+                            <th>Remarks</th>
+                            <th width="30"></th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <!-- Dynamic rows will go here -->
+                        </tbody>
+                      </table>
+                      <button type="button" id="btn-add-bill" class="btn btn-secondary btn-sm margin-top">
+                        <i data-lucide="plus"></i> Add Bill Record
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="grid-2-col margin-top-lg">
+                  <!-- Denominations -->
+                  <div class="card card-dark">
+                    <div class="form-section-title">Cash Denomination Count</div>
+                    <div class="denomination-grid">
+                      <div class="denom-row"><span>2000 x</span><input type="number" data-value="2000" class="denom-input" placeholder="0" min="0"></div>
+                      <div class="denom-row"><span>500 x</span><input type="number" data-value="500" class="denom-input" placeholder="0" min="0"></div>
+                      <div class="denom-row"><span>200 x</span><input type="number" data-value="200" class="denom-input" placeholder="0" min="0"></div>
+                      <div class="denom-row"><span>100 x</span><input type="number" data-value="100" class="denom-input" placeholder="0" min="0"></div>
+                      <div class="denom-row"><span>50 x</span><input type="number" data-value="50" class="denom-input" placeholder="0" min="0"></div>
+                      <div class="denom-row"><span>20 x</span><input type="number" data-value="20" class="denom-input" placeholder="0" min="0"></div>
+                      <div class="denom-row"><span>10 x</span><input type="number" data-value="10" class="denom-input" placeholder="0" min="0"></div>
+                      <div class="denom-row"><span>5 x</span><input type="number" data-value="5" class="denom-input" placeholder="0" min="0"></div>
+                      <div class="denom-row"><span>2 x</span><input type="number" data-value="2" class="denom-input" placeholder="0" min="0"></div>
+                      <div class="denom-row"><span>1 x</span><input type="number" data-value="1" class="denom-input" placeholder="0" min="0"></div>
+                    </div>
+                    <div class="denom-total margin-top">
+                      <span>Denominations Total:</span>
+                      <strong id="label-denom-total">₹0.00</strong>
+                    </div>
+                  </div>
+
+                  <!-- Actual Closing Balances -->
+                  <div class="card card-dark">
+                    <div class="form-section-title">Actual Closing Balances</div>
+                    <div class="form-group">
+                      <label for="close-cash">Closing Cash (₹)</label>
+                      <input type="number" id="close-cash" class="calc-closing-trigger" placeholder="0" min="0" step="0.01" required>
+                      <span class="note-helper">Should match the Denominations Total.</span>
+                    </div>
+                    <div class="grid-2-col margin-top">
+                      <div class="form-group">
+                        <label for="close-franchisee">Closing Franchisee (₹)</label>
+                        <input type="number" id="close-franchisee" placeholder="0" min="0" step="0.01">
+                      </div>
+                      <div class="form-group">
+                        <label for="close-mgmt">Closing Management (₹)</label>
+                        <input type="number" id="close-mgmt" placeholder="0" min="0" step="0.01">
+                      </div>
+                    </div>
+
+                    <!-- Calculated Balances / Excess / Short -->
+                    <div class="reconciliation-box margin-top-lg">
+                      <h4>Reconciliation (Cash Balance)</h4>
+                      <div class="recon-row">
+                        <span>Expected Cash:</span>
+                        <span id="label-expected-cash">₹0.00</span>
+                      </div>
+                      <div class="recon-row">
+                        <span>Actual Cash Entered:</span>
+                        <span id="label-actual-cash">₹0.00</span>
+                      </div>
+                      <hr>
+                      <div class="recon-row highlight">
+                        <span>Excess / (Short):</span>
+                        <span id="label-excess-short" class="neutral">₹0.00</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="validation-warning hide" id="warning-denom-mismatch">
+                  <i data-lucide="alert-triangle"></i>
+                  <span>Warning: Denominations Total does not match Actual Closing Cash. Please double-check!</span>
+                </div>
+              </div>
+
+              <!-- BUTTONS BAR -->
+              <div class="wizard-buttons">
+                <button type="button" id="btn-prev" class="btn btn-secondary hide">
+                  <i data-lucide="arrow-left"></i> Previous
+                </button>
+                <button type="button" id="btn-next" class="btn btn-primary">
+                  Next <i data-lucide="arrow-right"></i>
+                </button>
+                <button type="submit" id="btn-submit" class="btn btn-success hide">
+                  <i data-lucide="check-circle-2"></i> Submit Daily Report
+                </button>
+              </div>
+
+            </form>
+          </div>
+        </section>
+
+        <!-- ================= ADMIN MONITORING DASHBOARD ================= -->
+        <section id="view-admin-dashboard" class="view-panel">
+          
+          <!-- DATE FILTERS & METRIC OVERVIEW -->
+          <div class="dashboard-filter-bar">
+            <div class="filter-group">
+              <label>Select Date Range:</label>
+              <div class="pill-filters">
+                <button class="pill-btn active" data-range="7">7 Days</button>
+                <button class="pill-btn" data-range="30">30 Days</button>
+                <button class="pill-btn" data-range="90">90 Days</button>
+                <button class="pill-btn" id="btn-custom-range">Custom</button>
+              </div>
+            </div>
+            
+            <div class="custom-date-inputs hide" id="custom-date-inputs">
+              <input type="date" id="dash-start-date">
+              <span>to</span>
+              <input type="date" id="dash-end-date">
+              <button class="btn btn-sm btn-primary" id="btn-apply-custom-date">Apply</button>
+            </div>
+          </div>
+
+          <!-- KPI METRIC CARDS -->
+          <div class="kpi-grid">
+            <div class="kpi-card card-sales">
+              <div class="kpi-icon"><i data-lucide="wallet-cards"></i></div>
+              <div class="kpi-label">TOTAL SALES</div>
+              <div class="kpi-value" id="kpi-total-sales">₹0.00</div>
+              <div class="kpi-trend green">
+                <i data-lucide="trending-up"></i>
+                <span id="kpi-avg-daily">₹0.00 / day</span>
+              </div>
+            </div>
+            <div class="kpi-card card-expenses">
+              <div class="kpi-icon"><i data-lucide="banknote"></i></div>
+              <div class="kpi-label">TOTAL EXPENSES</div>
+              <div class="kpi-value" id="kpi-total-expenses">₹0.00</div>
+              <div class="kpi-trend orange">
+                <i data-lucide="arrow-down-right"></i>
+                <span>Purchases + Wages + Rent + Misc</span>
+              </div>
+            </div>
+            <div class="kpi-card card-net">
+              <div class="kpi-icon"><i data-lucide="badge-dollar-sign"></i></div>
+              <div class="kpi-label">NET PROFIT / LOSS</div>
+              <div class="kpi-value" id="kpi-net-profit">₹0.00</div>
+              <div class="kpi-trend" id="kpi-net-trend-color">
+                <i data-lucide="activity"></i>
+                <span id="kpi-net-percent">Margin calculated</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- CHARTS SECTION -->
+          <div class="grid-2-col margin-top-lg">
+            
+            <!-- Daily Sales vs Expenses Line Chart -->
+            <div class="card chart-container">
+              <div class="card-header">
+                <h3>SALES & EXPENSES TIMELINE</h3>
+                <p>Track revenues, expenditures, and margins over time</p>
+              </div>
+              <div class="chart-wrapper">
+                <canvas id="chart-timeline"></canvas>
+              </div>
+            </div>
+
+            <!-- Sales split and expense categories -->
+            <div class="grid-1-col-gap">
+              <!-- Sales Method split -->
+              <div class="card chart-container">
+                <div class="card-header">
+                  <h3>REVENUE CHANNELS SPLIT</h3>
+                  <p>Cash vs Card vs UPI vs Delivery (Zomato/Swiggy) vs Credit</p>
+                </div>
+                <div class="chart-wrapper-h">
+                  <canvas id="chart-sales-split"></canvas>
+                </div>
+              </div>
+
+              <!-- Expense categories -->
+              <div class="card chart-container">
+                <div class="card-header">
+                  <h3>EXPENSES DISTRIBUTION</h3>
+                  <p>Relative distribution of store operational expenses</p>
+                </div>
+                <div class="chart-wrapper-h">
+                  <canvas id="chart-expense-categories"></canvas>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </section>
+
+        <!-- ================= ADMIN REPORTS LOG VIEW ================= -->
+        <section id="view-admin-reports" class="view-panel">
+          <div class="card">
+            <div class="card-header flex-between">
+              <div>
+                <h3>Daily Reports Ledger</h3>
+                <p>Complete historical log of submitted store reports</p>
+              </div>
+              <div class="search-box">
+                <i data-lucide="search"></i>
+                <input type="text" id="report-search" placeholder="Search reports...">
+              </div>
+            </div>
+            
+            <div class="table-scroll-container">
+              <table id="table-reports-list" class="report-list-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Sales (₹)</th>
+                    <th>Expenses (₹)</th>
+                    <th>Net Profit (₹)</th>
+                    <th>Closing Cash (₹)</th>
+                    <th>Excess / Short (₹)</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="reports-list-tbody">
+                  <!-- Dynamic rows go here -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- ================= DETAILED REPORT MODAL (PDF / A4 PRINT STYLE) ================= -->
+  <div id="report-detail-modal" class="modal-overlay hide">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Report Detail</h2>
+        <div class="modal-actions">
+          <button class="btn btn-secondary btn-sm" id="btn-print-report">
+            <i data-lucide="printer"></i> Print Report
+          </button>
+          <button class="btn btn-icon-only modal-close" id="btn-close-modal">
+            <i data-lucide="x"></i>
+          </button>
+        </div>
+      </div>
+      
+      <div class="modal-body-scroll" id="print-area">
+        <!-- A4 Render of PDF Structure -->
+        <div class="pdf-page-container">
+          
+          <!-- PDF HEADER -->
+          <div class="pdf-report-header">
+            <div class="pdf-logo">DAILY REPORT</div>
+            <div class="pdf-date-box">
+              <span>Date:</span>
+              <strong id="pdf-report-date">—</strong>
+            </div>
+          </div>
+
+          <!-- SECTION 1: OPENING & INCOMES -->
+          <table class="pdf-table">
+            <thead>
+              <tr class="header-blue">
+                <th width="30%">Opening Balances</th>
+                <th width="25%" class="text-right">₹</th>
+                <th width="25%">Remarks</th>
+                <th width="20%">Documents</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Cash</strong></td>
+                <td class="text-right" id="pdf-open-cash">0.00</td>
+                <td id="pdf-open-cash-rem">-</td>
+                <td>-</td>
+              </tr>
+              <tr>
+                <td><strong>From Franchisee Owner</strong></td>
+                <td class="text-right" id="pdf-open-fran">0</td>
+                <td id="pdf-open-fran-rem">-</td>
+                <td>-</td>
+              </tr>
+              <tr>
+                <td><strong>From Management</strong></td>
+                <td class="text-right" id="pdf-open-mgmt">0</td>
+                <td id="pdf-open-mgmt-rem">-</td>
+                <td>-</td>
+              </tr>
+              <tr class="header-blue">
+                <th>INCOMES</th>
+                <th class="text-right">₹</th>
+                <th>Remarks</th>
+                <th>Documents</th>
+              </tr>
+              <tr>
+                <td><strong>Cash Sale</strong></td>
+                <td class="text-right" id="pdf-sale-cash">0.00</td>
+                <td>-</td>
+                <td>-</td>
+              </tr>
+              <tr>
+                <td><strong>Card Sale</strong></td>
+                <td class="text-right" id="pdf-sale-card">0.00</td>
+                <td>-</td>
+                <td>-</td>
+              </tr>
+              <tr>
+                <td><strong>UPI Sale</strong></td>
+                <td class="text-right" id="pdf-sale-upi">0.00</td>
+                <td>-</td>
+                <td>-</td>
+              </tr>
+              <tr>
+                <td><strong>Zomato Sale</strong></td>
+                <td class="text-right" id="pdf-sale-zomato">0.00</td>
+                <td>-</td>
+                <td>-</td>
+              </tr>
+              <tr>
+                <td><strong>Swiggy Sale</strong></td>
+                <td class="text-right" id="pdf-sale-swiggy">0</td>
+                <td>-</td>
+                <td>-</td>
+              </tr>
+              <tr>
+                <td><strong>Credit Sale</strong></td>
+                <td class="text-right" id="pdf-sale-credit">0</td>
+                <td>-</td>
+                <td>-</td>
+              </tr>
+              <tr class="total-row">
+                <td>Total Sales</td>
+                <td class="text-right" id="pdf-sales-total">0.00</td>
+                <td>-</td>
+                <td>-</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- SECTION 2: OTHER INCOME -->
+          <table class="pdf-table margin-top">
+            <thead>
+              <tr class="header-blue">
+                <th width="30%">Other Income</th>
+                <th width="15%" class="text-right">Cash (₹)</th>
+                <th width="15%" class="text-right">Bank (₹)</th>
+                <th width="15%" class="text-right">Total</th>
+                <th width="15%">Remarks</th>
+                <th width="10%">Documents</th>
+              </tr>
+            </thead>
+            <tbody id="pdf-other-income-rows">
+              <!-- Dynamic other income -->
+            </tbody>
+            <tfoot>
+              <tr class="total-row">
+                <td>Total Other Income</td>
+                <td class="text-right" id="pdf-oi-cash-total">0</td>
+                <td class="text-right" id="pdf-oi-bank-total">0</td>
+                <td class="text-right" id="pdf-oi-total">0</td>
+                <td>-</td>
+                <td>-</td>
+              </tr>
+              <tr>
+                <td>From Franchisee Owner</td>
+                <td colspan="2"></td>
+                <td class="text-right" id="pdf-oi-fran">0</td>
+                <td>-</td>
+                <td>-</td>
+              </tr>
+              <tr>
+                <td>From Management</td>
+                <td colspan="2"></td>
+                <td class="text-right" id="pdf-oi-mgmt">0</td>
+                <td>-</td>
+                <td>-</td>
+              </tr>
+              <tr class="income-total-banner">
+                <td colspan="3"><strong>INCOME-TOTAL</strong></td>
+                <td class="text-right" id="pdf-income-grand-total">0.00</td>
+                <td colspan="2"></td>
+              </tr>
+            </tfoot>
+          </table>
+
+          <!-- SECTION 3: EXPENSES -->
+          <table class="pdf-table margin-top">
+            <thead>
+              <tr class="header-blue">
+                <th width="30%">EXPENSES</th>
+                <th width="15%" class="text-right">Cash (₹)</th>
+                <th width="15%" class="text-right">Bank (₹)</th>
+                <th width="15%" class="text-right">Total</th>
+                <th width="15%">Remarks</th>
+                <th width="10%">Documents</th>
+              </tr>
+            </thead>
+            <tbody id="pdf-expense-rows">
+              <!-- General expenses, vendor payments, purchases -->
+            </tbody>
+            <tfoot>
+              <tr class="total-row">
+                <td>Total Expenses</td>
+                <td class="text-right" id="pdf-exp-cash-total">0.00</td>
+                <td class="text-right" id="pdf-exp-bank-total">0.00</td>
+                <td class="text-right" id="pdf-exp-grand-total">0.00</td>
+                <td>-</td>
+                <td>-</td>
+              </tr>
+            </tfoot>
+          </table>
+
+          <!-- SECTION 4: CLOSING & BALANCES -->
+          <table class="pdf-table margin-top">
+            <thead>
+              <tr class="header-blue">
+                <th width="30%">Closing Balances</th>
+                <th width="20%" class="text-right">₹</th>
+                <th width="30%">Remarks</th>
+                <th width="20%">Documents</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Cash</strong></td>
+                <td class="text-right" id="pdf-close-cash">0.00</td>
+                <td>-</td>
+                <td>-</td>
+              </tr>
+              <tr>
+                <td><strong>From Franchisee Owner</strong></td>
+                <td class="text-right" id="pdf-close-fran">0</td>
+                <td>-</td>
+                <td>-</td>
+              </tr>
+              <tr>
+                <td><strong>From Management</strong></td>
+                <td class="text-right" id="pdf-close-mgmt">0</td>
+                <td>-</td>
+                <td>-</td>
+              </tr>
+              <tr class="header-blue">
+                <th>Excess/(Short)</th>
+                <th class="text-right">₹</th>
+                <th>Remarks</th>
+                <th>Remarks</th>
+              </tr>
+              <tr>
+                <td><strong>Cash</strong></td>
+                <td class="text-right" id="pdf-excess-cash">0.00</td>
+                <td>-</td>
+                <td>-</td>
+              </tr>
+              <tr>
+                <td><strong>From Franchisee Owner</strong></td>
+                <td class="text-right" id="pdf-excess-fran">0</td>
+                <td>-</td>
+                <td>-</td>
+              </tr>
+              <tr>
+                <td><strong>From Management</strong></td>
+                <td class="text-right" id="pdf-excess-mgmt">0</td>
+                <td>-</td>
+                <td>-</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- SECTION 5: MEAT STOCK & BILLS -->
+          <div class="grid-2-col margin-top">
+            <table class="pdf-table">
+              <thead>
+                <tr class="header-blue">
+                  <th>MEAT</th>
+                  <th class="text-right">OPENING</th>
+                  <th class="text-right">Purchase</th>
+                  <th class="text-right">Used</th>
+                  <th class="text-right">WASTAGE</th>
+                  <th class="text-right">Balance</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Chicken</strong></td>
+                  <td class="text-right" id="pdf-meat-chick-open">0</td>
+                  <td class="text-right" id="pdf-meat-chick-purch">0</td>
+                  <td class="text-right" id="pdf-meat-chick-used">0</td>
+                  <td class="text-right" id="pdf-meat-chick-wast">0</td>
+                  <td class="text-right" id="pdf-meat-chick-bal">0</td>
+                </tr>
+                <tr>
+                  <td><strong>Beef</strong></td>
+                  <td class="text-right" id="pdf-meat-beef-open">0</td>
+                  <td class="text-right" id="pdf-meat-beef-purch">0</td>
+                  <td class="text-right" id="pdf-meat-beef-used">0</td>
+                  <td class="text-right" id="pdf-meat-beef-wast">0</td>
+                  <td class="text-right" id="pdf-meat-beef-bal">0</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <table class="pdf-table">
+              <thead>
+                <tr class="header-blue">
+                  <th>Bills Payable/Receivable</th>
+                  <th class="text-right">Amount (₹)</th>
+                  <th>Remarks</th>
+                </tr>
+              </thead>
+              <tbody id="pdf-bills-rows">
+                <!-- Dynamic Bills -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- SECTION 6: STAFF WAGES LEDGER -->
+          <table class="pdf-table margin-top">
+            <thead>
+              <tr class="header-blue">
+                <th>Staff Name</th>
+                <th>Designation</th>
+                <th class="text-right">OB</th>
+                <th class="text-right">Wage Payable</th>
+                <th class="text-right">Wage Paid</th>
+                <th class="text-right">Balance</th>
+              </tr>
+            </thead>
+            <tbody id="pdf-ledger-rows">
+              <!-- Staff ledger -->
+            </tbody>
+          </table>
+
+          <!-- SECTION 7: DENOMINATIONS -->
+          <table class="pdf-table margin-top" style="max-width: 400px;">
+            <thead>
+              <tr class="header-blue">
+                <th colspan="3">DENOMINATIONS</th>
+              </tr>
+              <tr>
+                <th>Notes</th>
+                <th class="text-right">Count</th>
+                <th class="text-right">Total (₹)</th>
+              </tr>
+            </thead>
+            <tbody id="pdf-denom-rows">
+              <!-- Denominations -->
+            </tbody>
+            <tfoot>
+              <tr class="total-row">
+                <td>TOTAL</td>
+                <td colspan="2" class="text-right" id="pdf-denom-total">₹0.00</td>
+              </tr>
+            </tfoot>
+          </table>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

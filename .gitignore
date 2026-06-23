@@ -1,0 +1,9 @@
+node_modules/
+.env
+.env.local
+.env.*.local
+store_data.json
+store_data.json.tmp
+.vercel
+
+.vercel

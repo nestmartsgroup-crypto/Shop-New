@@ -1,0 +1,22 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # Route /api/login to api.php?action=login
+    RewriteRule ^api/login$ api.php?action=login [QSA,L]
+    
+    # Route /api/reports to api.php?action=save_report or get_reports
+    RewriteCond %{REQUEST_METHOD} POST
+    RewriteRule ^api/reports$ api.php?action=save_report [QSA,L]
+    
+    RewriteCond %{REQUEST_METHOD} GET
+    RewriteRule ^api/reports$ api.php?action=get_reports [QSA,L]
+    
+    # Route /api/reports/details/(.*) to api.php?action=get_details&date=$1
+    RewriteRule ^api/reports/details/([^/]+)$ api.php?action=get_details&date=$1 [QSA,L]
+    
+    # Route /api/dashboard-summary to api.php?action=dashboard_summary
+    RewriteRule ^api/dashboard-summary$ api.php?action=dashboard_summary [QSA,L]
+
+    # Route /api/carry-forward to api.php?action=carry_forward
+    RewriteRule ^api/carry-forward$ api.php?action=carry_forward [QSA,L]
+</IfModule>
