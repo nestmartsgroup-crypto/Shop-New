@@ -8,12 +8,24 @@ const { Pool } = require('pg');
 let JSON_FILE_PATH = path.join(__dirname, 'store_data.json');
 const TMP_JSON_PATH = path.join(os.tmpdir(), 'store_data.json');
 
-// Supabase (Vercel Marketplace) sets POSTGRES_URL; Neon/other hosts often use DATABASE_URL
-const connectionString =
+// Supabase (Vercel Marketplace) sets various env names. Accept common variants
+// and also build a connection string from individual POSTGRES_* vars when provided.
+let connectionString =
   process.env.POSTGRES_URL ||
   process.env.DATABASE_URL ||
   process.env.SUPABASE_DB_URL ||
+  process.env.POSTGRES_URL_NON_POOLING ||
   null;
+
+// If we don't have a full URL but have host/user/password/db parts, construct it
+if (!connectionString && process.env.POSTGRES_HOST && process.env.POSTGRES_PASSWORD) {
+  const host = process.env.POSTGRES_HOST;
+  const user = process.env.POSTGRES_USER || process.env.POSTGRES_USERNAME || 'postgres';
+  const password = process.env.POSTGRES_PASSWORD;
+  const database = process.env.POSTGRES_DATABASE || process.env.POSTGRES_DB || 'postgres';
+  const port = process.env.POSTGRES_PORT || 5432;
+  connectionString = `postgresql://${user}:${encodeURIComponent(password)}@${host}:${port}/${database}`;
+}
 
 // Initialize Pool if a Postgres connection string is available
 let pool = null;
