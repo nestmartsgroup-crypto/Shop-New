@@ -13,7 +13,7 @@ app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
 
 // ── DEBUG: show all env vars keys (not values) so we can see what's set ──────
-app.get('/api/debug', (req, res) => {
+app.get("/api/debug", async (req, res) => {
   res.json({
     envKeys: Object.keys(process.env).filter(k =>
       ['DATABASE_URL','STAFF_PIN','ADMIN_PIN','STAFF_TOKEN','ADMIN_TOKEN','POSTGRES_URL','SUPABASE_URL','SUPABASE_DB_URL'].includes(k)
