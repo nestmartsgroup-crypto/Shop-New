@@ -409,6 +409,64 @@ input:focus, select:focus {
   max-width: 1400px;
   margin: 0 auto;
   width: calc(100% - 260px);
+  min-width: 0; /* prevents flex item from overflowing its container */
+}
+
+/* Hamburger button - hidden on desktop, shown on mobile */
+.mobile-menu-btn {
+  display: none;
+}
+
+/* Dark overlay behind the open mobile sidebar */
+.sidebar-overlay {
+  display: none;
+}
+
+/* ==========================================================================
+   MOBILE LAYOUT (sidebar becomes an off-canvas drawer)
+   ========================================================================== */
+@media (max-width: 768px) {
+  .app-layout {
+    display: block; /* stop forcing a side-by-side flex row */
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 260px;
+    max-width: 80vw;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    z-index: 1000;
+  }
+
+  .sidebar.mobile-open {
+    transform: translateX(0);
+  }
+
+  .main-content {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 1.25rem 1rem;
+  }
+
+  .mobile-menu-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.75rem;
+  }
+
+  .sidebar-overlay.active {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+  }
 }
 
 .top-header {

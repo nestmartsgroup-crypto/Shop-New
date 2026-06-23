@@ -92,11 +92,17 @@
       </div>
     </aside>
 
+    <!-- Overlay shown behind sidebar when open on mobile -->
+    <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
     <!-- MAIN MAIN CONTENT -->
     <main class="main-content">
       
       <!-- TOP HEADER BAR -->
       <header class="top-header">
+        <button id="btn-menu-toggle" class="btn-icon-only mobile-menu-btn" title="Menu">
+          <i data-lucide="menu"></i>
+        </button>
         <div class="header-title">
           <h2 id="header-page-title">Daily Entry</h2>
           <p id="header-page-subtitle">Fill in the daily reports details</p>
@@ -993,6 +999,33 @@
     </div>
   </div>
 
+  <script>
+    // Mobile sidebar drawer toggle
+    document.addEventListener('DOMContentLoaded', () => {
+      const sidebar = document.querySelector('.sidebar');
+      const overlay = document.getElementById('sidebar-overlay');
+      const menuBtn = document.getElementById('btn-menu-toggle');
+
+      function openSidebar() {
+        sidebar.classList.add('mobile-open');
+        overlay.classList.add('active');
+      }
+      function closeSidebar() {
+        sidebar.classList.remove('mobile-open');
+        overlay.classList.remove('active');
+      }
+
+      menuBtn?.addEventListener('click', () => {
+        sidebar.classList.contains('mobile-open') ? closeSidebar() : openSidebar();
+      });
+      overlay?.addEventListener('click', closeSidebar);
+
+      // Close drawer automatically after tapping a nav link on mobile
+      document.querySelectorAll('.nav-item a').forEach(link => {
+        link.addEventListener('click', closeSidebar);
+      });
+    });
+  </script>
   <script src="app.js"></script>
 </body>
 </html>
